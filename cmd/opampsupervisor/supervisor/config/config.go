@@ -30,4 +30,5 @@ type OpAMPServer struct {
 
 type Agent struct {
 	Executable string
+	Resource   map[string]string
 }

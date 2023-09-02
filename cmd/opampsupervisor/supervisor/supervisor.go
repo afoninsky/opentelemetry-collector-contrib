@@ -299,16 +299,21 @@ func keyVal(key, val string) *protobufs.KeyValue {
 func (s *Supervisor) createAgentDescription() *protobufs.AgentDescription {
 	hostname, _ := os.Hostname()
 
+	nonIdentifyingAttributes := []*protobufs.KeyValue{
+		keyVal("os.family", runtime.GOOS),
+		keyVal("host.name", hostname),
+	}
+	for key, value := range s.config.Agent.Resource {
+		nonIdentifyingAttributes = append(nonIdentifyingAttributes, keyVal(key, value))
+	}
+
 	return &protobufs.AgentDescription{
 		IdentifyingAttributes: []*protobufs.KeyValue{
 			keyVal("service.name", agentType),
 			keyVal("service.version", s.agentVersion),
 			keyVal("service.instance.id", s.instanceID.String()),
 		},
-		NonIdentifyingAttributes: []*protobufs.KeyValue{
-			keyVal("os.family", runtime.GOOS),
-			keyVal("host.name", hostname),
-		},
+		NonIdentifyingAttributes: nonIdentifyingAttributes,
 	}
 }
 
